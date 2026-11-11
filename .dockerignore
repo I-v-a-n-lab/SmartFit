@@ -1,0 +1,10 @@
+
+.git
+.metadata
+.settings
+.classpath
+.project
+src/
+data/
+target/*
+!target/smartfit-1.0.0.jar
