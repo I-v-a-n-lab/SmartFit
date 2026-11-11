@@ -19,6 +19,21 @@ public class Rezervacija {
         // Automatski se postavlja trenutni datum i vreme
         this.datumRezervacije = LocalDateTime.now();
     }
+    
+ // Konstruktor za ucitavanje sacuvane rezervacije
+    public Rezervacija(Clan clan, Trening trening,
+                       LocalDateTime datumRezervacije) {
+
+        setClan(clan);
+        setTrening(trening);
+
+        if (datumRezervacije == null) {
+            throw new IllegalArgumentException(
+                "Datum rezervacije ne sme biti prazan!");
+        }
+
+        this.datumRezervacije = datumRezervacije;
+    }
 
     // Getter i setter za clana
     public Clan getClan() {

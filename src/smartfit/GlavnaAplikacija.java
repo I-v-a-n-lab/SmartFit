@@ -12,11 +12,13 @@ import smartfit.model.Clanarina;
 import smartfit.model.Trener;
 import smartfit.model.Trening;
 import smartfit.servis.Teretana;
+import smartfit.servis.DataManager;
 
 public class GlavnaAplikacija {
 
-    private Scanner scanner;
-    private Teretana teretana;
+	private Scanner scanner;
+	private Teretana teretana;
+	private DataManager dataManager;
 
     private static final DateTimeFormatter FORMAT_DATUMA_I_VREMENA =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -25,8 +27,11 @@ public class GlavnaAplikacija {
     public GlavnaAplikacija() {
         scanner = new Scanner(System.in);
         teretana = new Teretana();
-    }
+        dataManager = new DataManager();
 
+        // Automatsko ucitavanje podataka
+        dataManager.ucitajPodatke(teretana);
+    }
     // Glavna metoda
     public static void main(String[] args) {
         GlavnaAplikacija aplikacija = new GlavnaAplikacija();
@@ -52,6 +57,7 @@ public class GlavnaAplikacija {
             System.out.println("8. Prikaz svih rezervacija");
             System.out.println("9. Naplata clanarine");
             System.out.println("0. Izlaz iz programa");
+            System.out.println("10. Prikaz svih osoba");
             System.out.println("================================");
 
             izbor = ucitajBroj("Izaberite opciju: ");
@@ -59,32 +65,41 @@ public class GlavnaAplikacija {
             switch (izbor) {
                 case 1:
                     dodajClana();
+                    
                     break;
                 case 2:
                     teretana.prikaziSveClanove();
                     break;
                 case 3:
                     dodajTrenera();
+                    
                     break;
                 case 4:
                     teretana.prikaziSveTrenere();
                     break;
                 case 5:
                     kreirajTrening();
+                    
                     break;
                 case 6:
                     teretana.prikaziSveTreninge();
                     break;
                 case 7:
                     napraviRezervaciju();
+                    
                     break;
                 case 8:
                     teretana.prikaziSveRezervacije();
                     break;
                 case 9:
                     naplatiClanarinu();
+                    
+                    break;
+                case 10:
+                    teretana.prikaziSveOsobe();
                     break;
                 case 0:
+                	dataManager.sacuvajPodatke(teretana);
                     System.out.println("Hvala sto ste koristili SmartFit!");
                     break;
                 default:
@@ -113,7 +128,8 @@ public class GlavnaAplikacija {
                     ime, prezime, email, telefon, brojKarte, datum);
 
             teretana.dodajClana(clan);
-
+            dataManager.sacuvajPodatke(teretana);
+            
             System.out.println("Clan je uspesno dodat!");
 
         } catch (IllegalArgumentException e) {
@@ -139,7 +155,8 @@ public class GlavnaAplikacija {
                     specijalizacija, iskustvo);
 
             teretana.dodajTrenera(trener);
-
+            dataManager.sacuvajPodatke(teretana);
+            
             System.out.println("Trener je uspesno dodat!");
 
         } catch (IllegalArgumentException e) {
@@ -190,7 +207,8 @@ public class GlavnaAplikacija {
                     naziv, trener, datumIVreme, kapacitet);
 
             teretana.dodajTrening(trening);
-
+            dataManager.sacuvajPodatke(teretana);
+            
             System.out.println("Trening je uspesno kreiran!");
 
         } catch (IllegalArgumentException e) {
@@ -254,7 +272,8 @@ public class GlavnaAplikacija {
                     teretana.getTreninzi().get(izborTreninga - 1);
 
             teretana.napraviRezervaciju(clan, trening);
-
+            dataManager.sacuvajPodatke(teretana);
+            
             System.out.println("Rezervacija je uspesno napravljena!");
 
         } catch (IllegalArgumentException e) {
@@ -262,16 +281,59 @@ public class GlavnaAplikacija {
         }
     }
 
+    
+
     // Naplata clanarine
     private void naplatiClanarinu() {
 
         try {
+            if (teretana.getClanovi().isEmpty()) {
+                System.out.println("Nema registrovanih clanova.");
+                return;
+            }
+
             System.out.println("\n--- NAPLATA CLANARINE ---");
+            System.out.println("Registrovani clanovi:");
+
+            // Prikaz svih registrovanih clanova
+            for (int i = 0; i < teretana.getClanovi().size(); i++) {
+
+                Clan clan = teretana.getClanovi().get(i);
+
+                System.out.println((i + 1) + ". "
+                        + clan.getIme() + " "
+                        + clan.getPrezime()
+                        + " - " + clan.getBrojClanskeKarte());
+
+                if (clan.getClanarina() != null) {
+                    System.out.println("   Trenutna clanarina: "
+                            + clan.getClanarina().getTip());
+                } else {
+                    System.out.println("   Trenutna clanarina: Nema");
+                }
+            }
+
+            // Izbor clana
+            int izborClana = ucitajBroj(
+                    "\nIzaberite clana: ");
+
+            if (izborClana < 1
+                    || izborClana > teretana.getClanovi().size()) {
+
+                System.out.println("Izabrani clan ne postoji.");
+                return;
+            }
+
+            Clan clan = teretana.getClanovi().get(izborClana - 1);
+
+            // Izbor tipa clanarine
+            System.out.println("\nIzaberite tip clanarine:");
             System.out.println("1. Mesecna - 3000 RSD");
             System.out.println("2. Tromesecna - 8000 RSD");
             System.out.println("3. Godisnja - 28000 RSD");
 
-            int izbor = ucitajBroj("Izaberite tip clanarine: ");
+            int izbor = ucitajBroj(
+                    "Izaberite tip clanarine: ");
 
             String tip;
 
@@ -286,19 +348,24 @@ public class GlavnaAplikacija {
                     tip = "godisnja";
                     break;
                 default:
-                    System.out.println("Nepostojeci tip clanarine.");
+                    System.out.println(
+                            "Nepostojeci tip clanarine.");
                     return;
             }
 
             Clanarina clanarina = new Clanarina(tip);
 
-            clanarina.prikaziClanarinu();
-            teretana.naplatiClanarinu(clanarina);
+            // Dodela clanarine i obrada naplate
+            teretana.naplatiClanarinu(clan, clanarina);
+            dataManager.sacuvajPodatke(teretana);
+            
+            System.out.println("Clanarina je uspesno naplacena!");
 
         } catch (IllegalArgumentException e) {
             System.out.println("Greska: " + e.getMessage());
         }
     }
+
 
     // Pomocna metoda za unos teksta
     private String ucitajTekst(String poruka) {

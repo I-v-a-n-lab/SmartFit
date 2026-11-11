@@ -11,3 +11,6 @@ bin/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Application data
+data/smartfit.json

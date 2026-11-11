@@ -7,6 +7,7 @@ public class Clan extends Osoba {
 
     private String brojClanskeKarte;
     private LocalDate datumUclanjenja;
+    private Clanarina clanarina;
 
     // Konstruktor
     public Clan(String ime, String prezime, String email, String telefon,
@@ -45,7 +46,22 @@ public class Clan extends Osoba {
 
         this.datumUclanjenja = datumUclanjenja;
     }
+ // Getter za clanarinu
+    public Clanarina getClanarina() {
+        return clanarina;
+    }
 
+    // Setter za clanarinu
+    public void setClanarina(Clanarina clanarina) {
+
+        if (clanarina == null) {
+            throw new IllegalArgumentException(
+                "Clanarina ne sme biti prazna!");
+        }
+
+        this.clanarina = clanarina;
+    }
+    
     // Redefinisanje metode iz klase Osoba
     @Override
     public void prikaziPodatke() {
@@ -56,5 +72,14 @@ public class Clan extends Osoba {
         System.out.println("Telefon: " + getTelefon());
         System.out.println("Broj clanske karte: " + brojClanskeKarte);
         System.out.println("Datum uclanjenja: " + datumUclanjenja);
+        if (clanarina != null) {
+            System.out.println("Clanarina: " + clanarina.getTip());
+            System.out.println("Cena clanarine: "
+                    + clanarina.izracunajCenu() + " RSD");
+            System.out.println("Trajanje clanarine: "
+                    + clanarina.getTrajanjeMeseci() + " meseci");
+        } else {
+            System.out.println("Clanarina: Nije dodeljena");
+        }
     }
 }

@@ -119,6 +119,53 @@ public class Teretana {
 
         rezervacije.add(new Rezervacija(clan, trening));
     }
+    
+ // Dodavanje prethodno sacuvane rezervacije
+    public void dodajSacuvanuRezervaciju(Rezervacija rezervacija) {
+
+        if (rezervacija == null) {
+            throw new IllegalArgumentException(
+                "Rezervacija ne moze biti null!");
+        }
+
+        if (!clanovi.contains(rezervacija.getClan())) {
+            throw new IllegalArgumentException(
+                "Clan rezervacije nije registrovan!");
+        }
+
+        if (!treninzi.contains(rezervacija.getTrening())) {
+            throw new IllegalArgumentException(
+                "Trening rezervacije ne postoji!");
+        }
+
+        for (Rezervacija postojeca : rezervacije) {
+
+            if (postojeca.getClan() == rezervacija.getClan()
+                    && postojeca.getTrening() == rezervacija.getTrening()) {
+
+                throw new IllegalArgumentException(
+                    "Ova rezervacija vec postoji!");
+            }
+        }
+
+        int brojRezervacija = 0;
+
+        for (Rezervacija postojeca : rezervacije) {
+
+            if (postojeca.getTrening() == rezervacija.getTrening()) {
+                brojRezervacija++;
+            }
+        }
+
+        if (brojRezervacija
+                >= rezervacija.getTrening().getMaksimalanBrojUcesnika()) {
+
+            throw new IllegalArgumentException(
+                "Trening je popunjen!");
+        }
+
+        rezervacije.add(rezervacija);
+    }
 
     // Prikaz svih osoba - demonstracija polimorfizma
     public void prikaziSveOsobe() {
@@ -191,17 +238,30 @@ public class Teretana {
     }
 
     // Naplata clanarine
-    public void naplatiClanarinu(Clanarina clanarina) {
+    public void naplatiClanarinu(Clan clan, Clanarina clanarina) {
 
-        if (clanarina == null) {
-            throw new IllegalArgumentException(
-                "Clanarina nije izabrana!");
-        }
+    	  if (clanarina == null) {
+              throw new IllegalArgumentException(
+                  "Clanarina nije izabrana!");
+          }
 
-        System.out.println("Uspesno obavljena naplata!");
-        System.out.println("Iznos: "
-            + clanarina.izracunajCenu() + " RSD");
-    }
+          if (!clanovi.contains(clan)) {
+              throw new IllegalArgumentException(
+                  "Clan nije registrovan u teretani!");
+          }
+
+          // Dodeljivanje nove clanarine clanu
+          clan.setClanarina(clanarina);
+
+          System.out.println("\nUspesno obavljena naplata!");
+          System.out.println("Clan: "
+                  + clan.getIme() + " " + clan.getPrezime());
+          System.out.println("Tip clanarine: " + clanarina.getTip());
+          System.out.println("Iznos: "
+                  + clanarina.izracunajCenu() + " RSD");
+      }
+     
+    
 
     // Getteri za liste
     public ArrayList<Clan> getClanovi() {

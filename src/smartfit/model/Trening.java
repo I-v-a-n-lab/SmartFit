@@ -20,6 +20,27 @@ public class Trening {
         setDatumIVreme(datumIVreme);
         setMaksimalanBrojUcesnika(maksimalanBrojUcesnika);
     }
+    
+ // Konstruktor za ucitavanje sacuvanog treninga
+    public Trening(String naziv, Trener trener, LocalDateTime datumIVreme,
+                   int maksimalanBrojUcesnika, boolean ucitavanje) {
+
+        setNaziv(naziv);
+        setTrener(trener);
+
+        if (datumIVreme == null) {
+            throw new IllegalArgumentException(
+                "Datum i vreme treninga ne smeju biti prazni!");
+        }
+
+        if (!ucitavanje && datumIVreme.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException(
+                "Datum i vreme treninga nisu ispravni!");
+        }
+
+        this.datumIVreme = datumIVreme;
+        setMaksimalanBrojUcesnika(maksimalanBrojUcesnika);
+    }
 
     // Getter i setter za naziv
     public String getNaziv() {
